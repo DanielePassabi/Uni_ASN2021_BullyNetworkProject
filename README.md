@@ -1,2 +1,7 @@
-# Uni_ASN2021_BullyNetworkProject
- Advanced Social Network Project
+# Advanced Social Network Project
+
+## Contributors
+
+- Mattolin Giulio
+- Paolazzi Elisa
+- Passabì Daniele
