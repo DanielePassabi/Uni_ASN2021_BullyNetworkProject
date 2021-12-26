@@ -45,9 +45,7 @@ You are also given a spreadsheet with attributes for each student (Attributes sh
     -	2=born in Italy with foreign parents (second generation immigrants), 
     -	3=born in Italy with at least one Italian parent (which we label “Italian”)
 
-### 1.1 
-
-Draw the network using the Fruchterman-Reingold layout with names (but without attributes). Add the R script of how you obtained the drawings.
+### 1.1. Draw the network using the Fruchterman-Reingold layout with names (but without attributes). Add the R script of how you obtained the drawings.
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -70,7 +68,7 @@ bully_matrix
 
 ```
 
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
 
 library(sna)
 
@@ -84,7 +82,6 @@ bully_network
 ```{r fig.height=14, fig.width=14}
 
 # Plot the network
-
 gplot(bully_network, 
       gmode = "digraph",
       
@@ -111,9 +108,7 @@ gplot(bully_network,
 ```
 
 
-### 1.2
-
-Next draw the network again using the Fruchterman-Reingold layout without names, but now with all 3 attributes (gender, grade and ethnicity) included using in some way a combination of color, shape and size of nodes. Add the R script of how you obtained the drawings. 
+### 1.2. Next draw the network again using the Fruchterman-Reingold layout without names, but now with all 3 attributes (gender, grade and ethnicity) included using in some way a combination of color, shape and size of nodes. Add the R script of how you obtained the drawings. 
 
 ```{r}
 
@@ -122,6 +117,12 @@ attributes_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheetName = "Attributes", h
 attributes_xlsx
 
 ```
+
+We decide to display the attributes as follows:
+
+- color represents **gender**
+- vertex shape represents **ethnicity**
+- vertex size represent **grade**
 
 ```{r fig.height=14, fig.width=14}
 
@@ -160,7 +161,7 @@ plot = gplot(bully_network,
       
       # nodes
       vertex.col = genderVectorColor,
-      vertex.cex = attributes_xlsx$Grade/5,
+      vertex.cex = attributes_xlsx$Grade/5, # size of the vectors represent grade value
       vertex.sides = ethnicityVectorColor,
       
       # arrow
@@ -175,9 +176,9 @@ plot = gplot(bully_network,
 ```
 
 
-### 1.3
+### 1.3. Create a legend for the attributes (this does not have to be with R, but needs to clarify how the different attributes were represented in the network).
 
-Create a legend for the attributes (this does not have to be with R, but needs to clarify how the different attributes were represented in the network).
+We can now plot the network with a customize legend indicating the previously specified attriubute-colour/shape/size combinations.
 
 ```{r fig.height=14, fig.width=14}
 
@@ -278,9 +279,7 @@ legend(
 
 ## 2. Centrality
 
-### 2.1
-
-Calculate *indegree* and *outdegree* **centrality** for each node and interpret your results. 
+### 2.1 Calculate *indegree* and *outdegree* **centrality** for each node and interpret your results. 
 
 - Provide the indegree and outdegree centrality score for each node.
 - Who is the most central when it comes to indegree?
@@ -315,11 +314,11 @@ degree_df[degree_df$indegree == max(degree_df$indegree),]
 
 ##### Provide details of the meaning of the value (taking into account that the network is “who do you bully?”)
 
-Since the network answers the question "who do you bully?" and the indegree value represents incoming ties, we can say that Sara is the most bullied person in the network.
+Since the network boundaries are represented by the question "who do you bully?" and the indegree value is the number of incoming ties, we can say that **Sara** is the most bullied person in the network.
 
 ##### Make sure to discuss the reference points for the indegree measure. How does it compare to the theoretical minimum and maximum value?
 
-The minimum possible value for Indegree is 0, i.e. the situation where a node is not bullied by any other node.
+The minimum possible value for Indegree is 0, i.e. the situation in which a node is not bullied by any other node.
 The maximum value is instead $n$ - 1 (in this case 25 - 1 = 24), meaning that a node is bullied by all other nodes except itself.
 
 We can normalize the obtained Indegree value to get the proportion of people bullying Sara, from a scale that goes from 0 to 1.
@@ -342,19 +341,20 @@ degree_df[degree_df$outdegree == max(degree_df$outdegree),]
 
 ##### Provide details of the meaning of the value (taking into account that the network is “who do you bully?”).
 
-In this case the measure refers to the number of people in the network that Francesco says he bullies.
+In this case the measure refers to the number of people in the network that **Francesco** says he bullies.
 
 ##### Make sure to discuss the reference points for the outdegree measure. How does it compare to the theoretical minimum and maximum value?
 
-Again, the minimum is 0, in the hypothetical situation where a node does not bully anyone and the maximum is $n$ nodes - 1, in the situation where an actor bullies all other nodes except himself.
+Again, the minimum value is 0, in the hypothetical situation where a node does not bully anyone, and the maximum is $n$ - 1, in the situation where an actor bullies all other nodes except himself.
 
 We find the normalized value:
 
 $$
 NormalizedOutdegree = \frac{Outdegree}{n-1} = \frac{8}{25-1} = 0.333
 $$
-
 Francesco bullies 1/3 of the network.
+
+We can also plot the previous graph by colouring Sara (in orange) and Francesco (in red) nodes:
 
 ```{r fig.height=14, fig.width=14}
 
