@@ -23,9 +23,9 @@ output:
 
 ### Group Members
 
-Mattolin Giulio, 
+Mattolin Giulio, 224072
 
-Paolazzi Elisa, 
+Paolazzi Elisa, 224424
 
 Passabì Daniele, 221229
 
@@ -49,9 +49,64 @@ You are also given a spreadsheet with attributes for each student (Attributes sh
 
 Draw the network using the Fruchterman-Reingold layout with names (but without attributes). Add the R script of how you obtained the drawings.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
-# TODO
+library(xlsx)
+library(dplyr)
+
+# Import .xlsx file
+bully_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheetName = "Bullying", header = TRUE)
+
+# Fix the column types (from dbl to int)
+bully_xlsx = bully_xlsx %>% 
+  mutate_if(is.numeric, as.integer)
+
+# Set the first column as Row Index
+bully_xlsx = data.frame(bully_xlsx[,-1], row.names = bully_xlsx[,1])
+
+# Convert the data to a matrix
+bully_matrix = as.matrix(bully_xlsx)
+bully_matrix
+
+```
+
+```{r message=FALSE}
+
+library(sna)
+
+# Convert the matrix into a "network" object
+bully_network = as.network(bully_matrix, directed = TRUE)
+bully_network
+
+```
+
+
+```{r fig.height=14, fig.width=14}
+
+# Plot the network
+
+gplot(bully_network, 
+      gmode = "digraph",
+      
+      # layout
+      mode = "fruchtermanreingold",
+      jitter = F,
+      
+      # ties
+      edge.col = "grey70",
+      
+      # nodes
+      vertex.col = "#59A5D8",
+      vertex.cex = 1,
+      
+      # arrow
+      arrowhead.cex = 0.5,
+      
+      # labels
+      displaylabels = T,
+      label.pos = 1,
+      label.cex = 1
+      )
 
 ```
 
@@ -62,7 +117,60 @@ Next draw the network again using the Fruchterman-Reingold layout without names,
 
 ```{r}
 
-# TODO
+# Import .xlsx attributes data
+attributes_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheetName = "Attributes", header = TRUE)
+attributes_xlsx
+
+```
+
+```{r fig.height=14, fig.width=14}
+
+# Prepare color vector for gender
+genderVectorColor = c()
+for (g in attributes_xlsx$Gender) {
+  if (g == 1) {
+    genderVectorColor = append(genderVectorColor, "#63A088")
+  } else {
+    genderVectorColor = append(genderVectorColor, "#A975A9")
+  }
+}
+
+# Prepare color vector for ethnicity
+ethnicityVectorColor = c()
+for (e in attributes_xlsx$Ethnicity) {
+  if (e == 1) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 50)
+  } else if (e == 2) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 3)
+  } else {
+    ethnicityVectorColor = append(ethnicityVectorColor, 4)
+  }
+}
+
+# Plot the network
+plot = gplot(bully_network, 
+      gmode = "digraph",
+      
+      # layout
+      mode = "fruchtermanreingold",
+      jitter = T,
+      
+      # ties
+      edge.col = "grey70",
+      
+      # nodes
+      vertex.col = genderVectorColor,
+      vertex.cex = attributes_xlsx$Grade/5,
+      vertex.sides = ethnicityVectorColor,
+      
+      # arrow
+      arrowhead.cex = 0.5,
+      
+      # labels
+      displaylabels = F,
+      label.pos = 1,
+      label.cex = 1
+      )
 
 ```
 
@@ -71,9 +179,98 @@ Next draw the network again using the Fruchterman-Reingold layout without names,
 
 Create a legend for the attributes (this does not have to be with R, but needs to clarify how the different attributes were represented in the network).
 
-```{r}
+```{r fig.height=14, fig.width=14}
 
-# TODO
+# Prepare color vector for gender
+genderVectorColor = c()
+for (g in attributes_xlsx$Gender) {
+  if (g == 1) {
+    genderVectorColor = append(genderVectorColor, "#63A088")
+  } else {
+    genderVectorColor = append(genderVectorColor, "#A975A9")
+  }
+}
+
+# Prepare color vector for ethnicity
+ethnicityVectorColor = c()
+for (e in attributes_xlsx$Ethnicity) {
+  if (e == 1) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 50)
+  } else if (e == 2) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 3)
+  } else {
+    ethnicityVectorColor = append(ethnicityVectorColor, 4)
+  }
+}
+
+# Plot the network
+gplot(bully_network, 
+      gmode = "digraph",
+      
+      # layout
+      mode = "fruchtermanreingold",
+      jitter = T,
+      
+      # ties
+      edge.col = "grey70",
+      
+      # nodes
+      vertex.col = genderVectorColor,
+      vertex.cex = attributes_xlsx$Grade/5,
+      vertex.sides = ethnicityVectorColor,
+      
+      # arrow
+      arrowhead.cex = 0.5,
+      
+      # labels
+      displaylabels = F,
+      label.pos = 1,
+      label.cex = 1
+      )
+
+# Customize the legend
+legend(
+  "topleft",
+  
+  legend = c(
+    "GENDER",
+    "Male", 
+    "Female", 
+    " ", 
+    "ETHNICITY", 
+    "1st Generation Immigrant (1)", 
+    "2nd Generation Immigrant (2)", 
+    "Italian (3)", 
+    " ", 
+    "GRADE", 
+    "1", 
+    "5",
+    "10"),
+  
+  col = c(
+    "white",
+    "#63A088",
+    "#A975A9",
+    "white",
+    "white",
+    "gray",
+    "gray",
+    "gray",
+    "white",
+    "white",
+    "gray",
+    "gray",
+    "gray"
+    ), 
+  
+  bty = "n", 
+  pch = c(19,19,19,19, 19,16,17,18,19, 16,16,16,16),
+  pt.cex = c(0,2.1,2.1,0, 0,2.1,1.9,2.1,0, 2.1,1,1.55,2.1), 
+  cex = 1, 
+  text.col = "grey10", 
+  horiz = F, 
+  inset = c(0)
+  )
 
 ```
 
@@ -92,13 +289,214 @@ Calculate *indegree* and *outdegree* **centrality** for each node and interpret 
 - Who is the most central when it comes to outdegree?
     - Provide details of the meaning of the value (taking into account that the network is “who do you bully?”).
     - Make sure to discuss the reference points for the outdegree measure. How does it compare to the theoretical minimum and maximum value?
+    
+    
+#### Provide the indegree and outdegree centrality score for each node.
 
 ```{r}
 
-# TODO
+id = rownames(bully_xlsx)
+indegree = sna::degree(bully_network, gmode = "digraph", cmode = "indegree")
+outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
+freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
+
+degree_df = data.frame(id, indegree, outdegree, freeman)
+degree_df
 
 ```
 
+#### Who is the most central when it comes to indegree?
+
+```{r}
+
+degree_df[degree_df$indegree == max(degree_df$indegree),]
+
+```
+
+##### Provide details of the meaning of the value (taking into account that the network is “who do you bully?”)
+
+Since the network answers the question "who do you bully?" and the indegree value represents incoming ties, we can say that Sara is the most bullied person in the network.
+
+##### Make sure to discuss the reference points for the indegree measure. How does it compare to the theoretical minimum and maximum value?
+
+The minimum possible value for Indegree is 0, i.e. the situation where a node is not bullied by any other node.
+The maximum value is instead $n$ - 1 (in this case 25 - 1 = 24), meaning that a node is bullied by all other nodes except itself.
+
+We can normalize the obtained Indegree value to get the proportion of people bullying Sara, from a scale that goes from 0 to 1.
+
+$$
+NormalizedIndegree = \frac{Indegree}{n-1} = \frac{9}{25-1} = 0.375
+$$
+
+From the *NormalizedIndegree* value we can see that Sara is bullied by more than 1/3 of the people in the network.
+
+
+
+#### Who is the most central when it comes to outdegree?
+
+```{r}
+
+degree_df[degree_df$outdegree == max(degree_df$outdegree),]
+
+```
+
+##### Provide details of the meaning of the value (taking into account that the network is “who do you bully?”).
+
+In this case the measure refers to the number of people in the network that Francesco says he bullies.
+
+##### Make sure to discuss the reference points for the outdegree measure. How does it compare to the theoretical minimum and maximum value?
+
+Again, the minimum is 0, in the hypothetical situation where a node does not bully anyone and the maximum is $n$ nodes - 1, in the situation where an actor bullies all other nodes except himself.
+
+We find the normalized value:
+
+$$
+NormalizedOutdegree = \frac{Outdegree}{n-1} = \frac{8}{25-1} = 0.333
+$$
+
+Francesco bullies 1/3 of the network.
+
+
+```{r fig.height=14, fig.width=14}
+
+# Prepare color vector for names
+namesVectorColor = c()
+for (n in attributes_xlsx$ID) {
+  if (n == "Sara") {
+    namesVectorColor = append(namesVectorColor, "#F9A03F")
+  } else if (n == "Francesco"){
+    namesVectorColor = append(namesVectorColor, "#CA1551")
+  } else {
+    namesVectorColor = append(namesVectorColor, "#59A5D8")
+  }
+}
+
+# Plot the network
+
+gplot(bully_network, 
+      gmode = "digraph",
+      
+      # layout
+      mode = "fruchtermanreingold",
+      jitter = F,
+      
+      # ties
+      edge.col = "grey70",
+      
+      # nodes
+      vertex.col = namesVectorColor,
+      vertex.cex = 1,
+      
+      # arrow
+      arrowhead.cex = 0.5,
+      
+      # labels
+      displaylabels = T,
+      label.pos = 1,
+      label.cex = 1
+      )
+
+```
+
+```{r fig.height=14, fig.width=14}
+
+# Prepare color vector for gender
+genderVectorColor = c()
+for (g in attributes_xlsx$Gender) {
+  if (g == 1) {
+    genderVectorColor = append(genderVectorColor, "#63A088")
+  } else {
+    genderVectorColor = append(genderVectorColor, "#A975A9")
+  }
+}
+
+genderVectorColor[which(degree_df$id == "Sara")] = "#F9A03F"
+genderVectorColor[which(degree_df$id == "Francesco")] = "#CA1551"
+
+# Prepare color vector for ethnicity
+ethnicityVectorColor = c()
+for (e in attributes_xlsx$Ethnicity) {
+  if (e == 1) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 50)
+  } else if (e == 2) {
+    ethnicityVectorColor = append(ethnicityVectorColor, 3)
+  } else {
+    ethnicityVectorColor = append(ethnicityVectorColor, 4)
+  }
+}
+
+# Plot the network
+gplot(bully_network, 
+      gmode = "digraph",
+      
+      # layout
+      mode = "fruchtermanreingold",
+      jitter = T,
+      
+      # ties
+      edge.col = "grey70",
+      
+      # nodes
+      vertex.col = genderVectorColor,
+      vertex.cex = attributes_xlsx$Grade/5,
+      vertex.sides = ethnicityVectorColor,
+      
+      # arrow
+      arrowhead.cex = 0.5,
+      
+      # labels
+      displaylabels = F,
+      label.pos = 1,
+      label.cex = 1
+      )
+
+# Customize the legend
+legend(
+  "topleft",
+  
+  legend = c(
+    "GENDER",
+    "Male", 
+    "Female", 
+    " ", 
+    "ETHNICITY", 
+    "1st Generation Immigrant (1)", 
+    "2nd Generation Immigrant (2)", 
+    "Italian (3)", 
+    " ", 
+    "GRADE", 
+    "1", 
+    "5",
+    "10"),
+  
+  col = c(
+    "white",
+    "#63A088",
+    "#A975A9",
+    "white",
+    "white",
+    "gray",
+    "gray",
+    "gray",
+    "white",
+    "white",
+    "gray",
+    "gray",
+    "gray"
+    ), 
+  
+  bty = "n", 
+  pch = c(19,19,19,19, 19,16,17,18,19, 16,16,16,16),
+  pt.cex = c(0,2.1,2.1,0, 0,2.1,1.9,2.1,0, 2.1,1,1.55,2.1), 
+  cex = 1, 
+  text.col = "grey10", 
+  horiz = F, 
+  inset = c(0)
+  )
+
+```
+
+The last graph highlights that Sara has high marks (9), while Francesco has lower marks (5). Francesco is a first generation immigrant, while Sara is a second generation immigrant.
 
 ### 2.2
 
