@@ -456,79 +456,101 @@ legend(
 
 The last graph highlights that Sara has high marks (9), while Francesco has lower marks (5). Francesco is a first generation immigrant, while Sara is a second generation immigrant.
 
-### 2.2
-
-Let’s assume we hypothesize that the grade of students might be impacted by how many others they are being bullied by. Calculate the correlation between the indegree and the grade of the kid.
+### 2.2 Let’s assume we hypothesize that the grade of students might be impacted by how many others they are being bullied by. Calculate the correlation between the indegree and the grade of the kid.
 
 - What is the correlation value?
 - What does it mean substantively?
 - Provide the R script of how you obtain the results.
 
-
+#### What is the correlation value?
 ```{r}
+
+# Add indegree and outdegree values to our dataset
 merge_df <- cbind(attributes_xlsx, degree_df$indegree, degree_df$outdegree)
 names(merge_df)[5] = "Indegree"
 names(merge_df)[6] = "Outdegree"
 merge_df
+
 ```
 
 ```{r}
+
+# Calculate correlation
 cor.test(merge_df$Grade, merge_df$Indegree)
+
 ```
 
+#### What does it mean substantively?
 ```{r message=FALSE, warning=FALSE}
+
 library(ggplot2)
 
+# Plot the indegree-grade scatterplot
 ggplot(merge_df, aes(x=Indegree, y=Grade)) + 
     geom_point(size=3) +
+    # add regression line
     geom_smooth(method=lm , color="red", se=FALSE)
+
 ```
 
-Looking at the results we can say that there is a high correlation between the grade and the indegree (how much a  person is bullied). We can see that this result is statistically significant given its low p-value. Moreover, we can say that a person with high grades tends to be bullied more, as we saw in Sara's example and in the scatterplot above.
+Looking at the results we can say that there is a high correlation between the grade and the indegree (how much a  person is bullied). It is possible to see that this result is statistically significant given its low p-value. Moreover, we can derive that a person with high grades tends to be bullied more, as we saw in Sara's example and in the scatterplot above.
 
 
 Out of curiosity, we also inspect the correlation between the outdegree and the grades.
 
 
 ```{r}
+
+# Calculate correlation
 cor.test(merge_df$Grade, merge_df$Outdegree)
+
 ```
 
 ```{r message=FALSE, warning=FALSE}
+
+# Plot the indegree-grade scatterplot
 ggplot(merge_df, aes(x=Outdegree, y=Grade)) + 
     geom_point(size=3) +
     geom_smooth(method=lm , color="red", se=FALSE)
+
 ```
 
 In this case, we have a low negative correlation (-0.20) and a quite high p-value, thus the result cannot be considered as statically significant.
 
 
-### 2.3
-
-Finally, perform a significance test using a permutation-based approach for the correlation as discussed in class.
+### 2.3 Finally, perform a significance test using a permutation-based approach for the correlation as discussed in class.
 
 -	What does the significance test do and what do you conclude?
 -	Add the R script of how you obtained the results.
 
 ```{r}
+
+# Set seed in order to get a reproducible random result
 set.seed(1)
 
+# Create the number of permutations value (to be easily changed)
 n_permutation = 20000
 
+# Build a permutation based approach to test for significance
 OUTPUT<-matrix(NA,n_permutation,1)
 for (k in c(1:n_permutation))
 {
-  grade_PERM<-sample(merge_df$Grade)
+  grade_PERM<-sample(merge_df$Grade) # grade permutation
   OUTPUT[k,1]<-cor(merge_df$Indegree, grade_PERM)
 }
 
+# Plot the results as an histrogram
 hist(OUTPUT, nclass=30, prob=T)
+# add upper bounder
 abline(v = mean(OUTPUT) + sd(OUTPUT)*1.96, col = "red", lwd = 3) # 0.4012781
+# add lower bounder
 abline(v = mean(OUTPUT) - sd(OUTPUT)*1.96, col = "red", lwd = 3) # -0.4001141
 
 ```
 
 ```{r}
+
+# Assign the real value of correlation to a variable
 corRealValue = cor(merge_df$Grade, merge_df$Indegree)
 
 message("% of times that the correlation were >= the found correlation value")
@@ -541,7 +563,8 @@ message("\n% of times that the correlation were >= or < the found correlation va
 sum(OUTPUT >= +abs(corRealValue))/n_permutation + sum(OUTPUT <= -abs(corRealValue))/n_permutation
 ```
 
-In none of the permutations we obtain a value greater or less than the true correlation value between the indegree and the grades. This confirms what we expected since the p-value is very low and it is therefore highly unlikely that there would be such a correlation by chance. Moreover, as we have seen in the scatterplot there do not seem to be any outliers that affect the correlation.
+In none of the permutations we obtain a value greater or less than the true indegree-grade correlation value. This confirms what we expected since the p-value is very low and it is therefore highly unlikely that there would be such a correlation by chance. Moreover, as we have seen in the previous scatterplot, there seem to be no outliers able to affect the correlation.
+It might also be noted that the histogram seems to have a normal shape, however this may not be the case, since it is the p-value itself that is built on the assumption of normality.
 
 
 ---
