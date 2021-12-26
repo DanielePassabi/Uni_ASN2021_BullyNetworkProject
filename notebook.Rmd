@@ -362,14 +362,15 @@ We can also plot the previous graph by colouring Sara (in orange) and Francesco 
 genderVectorColor = c()
 for (g in attributes_xlsx$Gender) {
   if (g == 1) {
-    genderVectorColor = append(genderVectorColor, "#63A088")
+    genderVectorColor = append(genderVectorColor, "#c5e3d7")
   } else {
-    genderVectorColor = append(genderVectorColor, "#A975A9")
+    genderVectorColor = append(genderVectorColor, "#ebd8eb")
   }
 }
 
-genderVectorColor[which(degree_df$id == "Sara")] = "#F9A03F"
-genderVectorColor[which(degree_df$id == "Francesco")] = "#CA1551"
+# Prepare darker color vector for Sara and Francesco nodes
+genderVectorColor[which(degree_df$id == "Sara")] = "#A975A9"
+genderVectorColor[which(degree_df$id == "Francesco")] = "#63A088"
 
 # Prepare color vector for ethnicity
 ethnicityVectorColor = c()
@@ -382,6 +383,9 @@ for (e in attributes_xlsx$Ethnicity) {
     ethnicityVectorColor = append(ethnicityVectorColor, 4)
   }
 }
+
+# Prepare label vector for Francesco and Sara's nodes.  
+label_vector = c("","","","","","","","Francesco","","","","","","","","","","","","","Sara","","","","")
 
 # Plot the network
 gplot(bully_network, 
@@ -403,7 +407,7 @@ gplot(bully_network,
       arrowhead.cex = 0.5,
       
       # labels
-      displaylabels = F,
+      label=label_vector,
       label.pos = 1,
       label.cex = 1
       )
