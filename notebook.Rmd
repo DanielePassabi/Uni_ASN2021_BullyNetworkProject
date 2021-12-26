@@ -356,48 +356,6 @@ $$
 
 Francesco bullies 1/3 of the network.
 
-
-```{r fig.height=14, fig.width=14}
-
-# Prepare color vector for names
-namesVectorColor = c()
-for (n in attributes_xlsx$ID) {
-  if (n == "Sara") {
-    namesVectorColor = append(namesVectorColor, "#F9A03F")
-  } else if (n == "Francesco"){
-    namesVectorColor = append(namesVectorColor, "#CA1551")
-  } else {
-    namesVectorColor = append(namesVectorColor, "#59A5D8")
-  }
-}
-
-# Plot the network
-
-gplot(bully_network, 
-      gmode = "digraph",
-      
-      # layout
-      mode = "fruchtermanreingold",
-      jitter = F,
-      
-      # ties
-      edge.col = "grey70",
-      
-      # nodes
-      vertex.col = namesVectorColor,
-      vertex.cex = 1,
-      
-      # arrow
-      arrowhead.cex = 0.5,
-      
-      # labels
-      displaylabels = T,
-      label.pos = 1,
-      label.cex = 1
-      )
-
-```
-
 ```{r fig.height=14, fig.width=14}
 
 # Prepare color vector for gender
@@ -508,10 +466,41 @@ Let’s assume we hypothesize that the grade of students might be impacted by ho
 
 
 ```{r}
-
-# TODO
-
+merge_df <- cbind(attributes_xlsx, degree_df$indegree, degree_df$outdegree)
+names(merge_df)[5] = "Indegree"
+names(merge_df)[6] = "Outdegree"
+merge_df
 ```
+
+```{r}
+cor.test(merge_df$Grade, merge_df$Indegree)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+
+ggplot(merge_df, aes(x=Indegree, y=Grade)) + 
+    geom_point(size=3) +
+    geom_smooth(method=lm , color="red", se=FALSE)
+```
+
+Looking at the results we can say that there is a high correlation between the grade and the indegree (how much a  person is bullied). We can see that this result is statistically significant given its low p-value. Moreover, we can say that a person with high grades tends to be bullied more, as we saw in Sara's example and in the scatterplot above.
+
+
+Out of curiosity, we also inspect the correlation between the outdegree and the grades.
+
+
+```{r}
+cor.test(merge_df$Grade, merge_df$Outdegree)
+```
+
+```{r message=FALSE, warning=FALSE}
+ggplot(merge_df, aes(x=Outdegree, y=Grade)) + 
+    geom_point(size=3) +
+    geom_smooth(method=lm , color="red", se=FALSE)
+```
+
+In this case, we have a low negative correlation (-0.20) and a quite high p-value, thus the result cannot be considered as statically significant.
 
 
 ### 2.3
@@ -522,10 +511,38 @@ Finally, perform a significance test using a permutation-based approach for the 
 -	Add the R script of how you obtained the results.
 
 ```{r}
+set.seed(1)
 
-# TODO
+n_permutation = 20000
+
+OUTPUT<-matrix(NA,n_permutation,1)
+for (k in c(1:n_permutation))
+{
+  grade_PERM<-sample(merge_df$Grade)
+  OUTPUT[k,1]<-cor(merge_df$Indegree, grade_PERM)
+}
+
+hist(OUTPUT, nclass=30, prob=T)
+abline(v = mean(OUTPUT) + sd(OUTPUT)*1.96, col = "red", lwd = 3) # 0.4012781
+abline(v = mean(OUTPUT) - sd(OUTPUT)*1.96, col = "red", lwd = 3) # -0.4001141
 
 ```
+
+```{r}
+corRealValue = cor(merge_df$Grade, merge_df$Indegree)
+
+message("% of times that the correlation were >= the found correlation value")
+sum(OUTPUT >= +abs(corRealValue))/n_permutation
+
+message("\n% of times that the correlation were < the found correlation value")
+sum(OUTPUT <= -abs(corRealValue))/n_permutation
+
+message("\n% of times that the correlation were >= or < the found correlation value")
+sum(OUTPUT >= +abs(corRealValue))/n_permutation + sum(OUTPUT <= -abs(corRealValue))/n_permutation
+```
+
+In none of the permutations we obtain a value greater or less than the true correlation value between the indegree and the grades. This confirms what we expected since the p-value is very low and it is therefore highly unlikely that there would be such a correlation by chance. Moreover, as we have seen in the scatterplot there do not seem to be any outliers that affect the correlation.
+
 
 ---
 
