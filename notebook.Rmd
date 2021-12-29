@@ -292,13 +292,21 @@ legend(
     
 #### Provide the indegree and outdegree centrality score for each node.
 
+We can calculate indegree and outdegree by counting the incoming and outgoing ties or simply by using the sna function *degree*.
+
 ```{r}
 
+# Set nodes name as id
 id = rownames(bully_xlsx)
+
+# Calculate indegree
 indegree = sna::degree(bully_network, gmode = "digraph", cmode = "indegree")
+# Calculate outdegree
 outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
+# Calculate centrality
 freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
 
+# Create a dataset to stor these infromation
 degree_df = data.frame(id, indegree, outdegree, freeman)
 degree_df
 
@@ -308,6 +316,7 @@ degree_df
 
 ```{r}
 
+# Get the maximum indegree row
 degree_df[degree_df$indegree == max(degree_df$indegree),]
 
 ```
@@ -335,6 +344,7 @@ From the *NormalizedIndegree* value we can see that Sara is bullied by more than
 
 ```{r}
 
+# Get the maximum outdegree row
 degree_df[degree_df$outdegree == max(degree_df$outdegree),]
 
 ```
@@ -471,6 +481,7 @@ The last graph highlights that Sara has high marks (9), while Francesco has lowe
 
 # Add indegree and outdegree values to our dataset
 merge_df <- cbind(attributes_xlsx, degree_df$indegree, degree_df$outdegree)
+# change column names
 names(merge_df)[5] = "Indegree"
 names(merge_df)[6] = "Outdegree"
 merge_df
@@ -512,7 +523,7 @@ cor.test(merge_df$Grade, merge_df$Outdegree)
 
 ```{r message=FALSE, warning=FALSE}
 
-# Plot the indegree-grade scatterplot
+# Plot the indegree-grade scatterplot using ggplot2
 ggplot(merge_df, aes(x=Outdegree, y=Grade)) + 
     geom_point(size=3) +
     geom_smooth(method=lm , color="red", se=FALSE)
@@ -586,6 +597,7 @@ Calculate the *indegree* and *outdegree* **centralization** for this network usi
 ```{r}
 
 # TODO
+# Freeman calcolata nel secondo punto?
 
 ```
 
