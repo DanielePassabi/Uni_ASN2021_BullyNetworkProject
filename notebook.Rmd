@@ -306,6 +306,7 @@ outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
 # Calculate centrality
 freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
 
+
 # Create a dataset to stor these infromation
 degree_df = data.frame(id, indegree, outdegree, freeman)
 degree_df
@@ -594,11 +595,46 @@ Calculate the *indegree* and *outdegree* **centralization** for this network usi
 
 ```{r}
 
-# TODO
-# Freeman calcolata nel secondo punto?
+max_indegree = degree_df[degree_df$indegree == max(indegree),]$indegree
+
+degree_df$indegree_centralization = max_indegree - degree_df$indegree
+
+
+max_outdegree = degree_df[degree_df$outdegree == max(outdegree),]$outdegree
+
+degree_df$outdegree_centralization = max_outdegree - degree_df$outdegree
+
+degree_df
 
 ```
+```{r}
 
+indegree_centralization_network = sum(degree_df$indegree_centralization)
+outdegree_centralization_network = sum(degree_df$outdegree_centralization)
+
+# We can normalize the results
+n = nrow(degree_df)
+
+max_indegree_centralization = (n-1)^2
+
+normalized_indegree_centralization_network = indegree_centralization_network/max_indegree_centralization
+
+max_outdegree_centralization = (n-1)^2
+
+normalized_outdegree_centralization_network = outdegree_centralization_network/max_outdegree_centralization
+
+message("Indegree centralization: ", indegree_centralization_network)
+message("Maximum indegree centralization: ", max_indegree_centralization)
+message("Normalized indegree centralization: ", round(normalized_indegree_centralization_network, 2))
+
+message("Outdegree centralization: ", outdegree_centralization_network)
+message("Maximum outdegree centralization: ", max_outdegree_centralization)
+message("Normalized outdegree centralization: ", round(normalized_outdegree_centralization_network, 2))
+
+```
+The minimum value of indegree and outdegree centralization that can be observed in a network is 0. On the other hand the maximum value is, as we have calculated, equal to: $(n-1)^2$
+
+As can be seen, the normalized values of outdegree and indegree centralization are not very high, which means that in both cases there is no very central node. This means that no one is bullied by the majority of the network or bullies most of the classmates.
 
 ### 3.2
 
@@ -610,9 +646,39 @@ Calculate the arc-based reciprocity index for this network and interpret.
 
 ```{r}
 
-# TODO
+# Dyad census
+sna::dyad.census(bully_matrix)
+
+# Arc-based reciprocity
+sna::grecip(bully_matrix, measure = "edgewise")
+
+# With IGRAPH
+library(igraph)
+# Convert in adjency matrix for igraph function
+adj_matrix = graph_from_adjacency_matrix(bully_matrix, mode = c("directed"), diag = F)
+# Arc-based reciprocity
+igraph::reciprocity(adj_matrix)
 
 ```
+Sna's `grecip()` uses the following formula to obtain the index reciprocity value:
+$$
+Index(reciprocity) = \frac{2\cdot Mutual}{2\cdot Mutual + Asymmetric} = \frac{2\cdot 2}{2\cdot 2 + 70} = 0.0541
+$$
+The minimum possible value is 0, which is anti-reciprocity:
+$$
+\frac{2 \cdot M}{2 \cdot M+A}=\frac{2 \cdot 0}{2 \cdot 0+A}=\frac{0}{A}=0
+$$
+It occurs when there are no reciprocal dyads.
+
+The maximum possible value is 1, which is perfect reciprocation:
+
+$$
+\frac{2 \cdot M}{2 \cdot M+A}=\frac{2 \cdot M}{2 \cdot M+0}=\frac{2 \cdot M}{2 \cdot M}=1
+$$
+It occurs when there are only reciprocal dyads and no asymmetrical dyads in the network.
+
+As it can be seen, the index for our network is very close to the minimum value. By calculating indegree and outdegree, bullies can also be bullied (Angela: indegree = 4, outdegree = 6), but usually the same actors are not involved. In our network it is therefore rare for nodes to bully each other. This result seems to be realistic since usually the "who do you bully" relationship is typically one-sided.
+
 
 ---
 
