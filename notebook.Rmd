@@ -480,10 +480,7 @@ The last graph highlights that Sara has high marks (9), while Francesco has lowe
 ```{r}
 
 # Add indegree and outdegree values to our dataset
-merge_df <- cbind(attributes_xlsx, degree_df$indegree, degree_df$outdegree)
-# change column names
-names(merge_df)[5] = "Indegree"
-names(merge_df)[6] = "Outdegree"
+merge_df <- merge(attributes_xlsx, degree_df, by.x = "ID", by.y = "id")
 merge_df
 
 ```
@@ -491,7 +488,7 @@ merge_df
 ```{r}
 
 # Calculate correlation
-cor.test(merge_df$Grade, merge_df$Indegree)
+cor.test(merge_df$Grade, merge_df$indegree)
 
 ```
 
@@ -501,7 +498,7 @@ cor.test(merge_df$Grade, merge_df$Indegree)
 library(ggplot2)
 
 # Plot the indegree-grade scatterplot
-ggplot(merge_df, aes(x=Indegree, y=Grade)) + 
+ggplot(merge_df, aes(x=indegree, y=Grade)) + 
     geom_point(size=3) +
     # add regression line
     geom_smooth(method=lm , color="red", se=FALSE)
@@ -517,14 +514,14 @@ Out of curiosity, we also inspect the correlation between the outdegree and the 
 ```{r}
 
 # Calculate correlation
-cor.test(merge_df$Grade, merge_df$Outdegree)
+cor.test(merge_df$Grade, merge_df$outdegree)
 
 ```
 
 ```{r message=FALSE, warning=FALSE}
 
 # Plot the indegree-grade scatterplot using ggplot2
-ggplot(merge_df, aes(x=Outdegree, y=Grade)) + 
+ggplot(merge_df, aes(x=outdegree, y=Grade)) + 
     geom_point(size=3) +
     geom_smooth(method=lm , color="red", se=FALSE)
 
@@ -551,7 +548,7 @@ OUTPUT<-matrix(NA,n_permutation,1)
 for (k in c(1:n_permutation))
 {
   grade_PERM<-sample(merge_df$Grade) # grade permutation
-  OUTPUT[k,1]<-cor(merge_df$Indegree, grade_PERM)
+  OUTPUT[k,1]<-cor(merge_df$indegree, grade_PERM)
 }
 
 # Plot the results as an histrogram
@@ -566,16 +563,17 @@ abline(v = mean(OUTPUT) - sd(OUTPUT)*1.96, col = "red", lwd = 3) # -0.4001141
 ```{r}
 
 # Assign the real value of correlation to a variable
-corRealValue = cor(merge_df$Grade, merge_df$Indegree)
+corRealValue = cor(merge_df$Grade, merge_df$indegree)
 
-message("% of times that the correlation were >= the found correlation value")
-sum(OUTPUT >= +abs(corRealValue))/n_permutation
+message("% of times that the correlation were >= the found correlation value \n",
+        sum(OUTPUT >= +abs(corRealValue))/n_permutation)
 
-message("\n% of times that the correlation were < the found correlation value")
-sum(OUTPUT <= -abs(corRealValue))/n_permutation
+message("\n% of times that the correlation were < the found correlation value \n",
+        sum(OUTPUT <= -abs(corRealValue))/n_permutation)
 
-message("\n% of times that the correlation were >= or < the found correlation value")
-sum(OUTPUT >= +abs(corRealValue))/n_permutation + sum(OUTPUT <= -abs(corRealValue))/n_permutation
+message("\n% of times that the correlation were >= or < the found correlation value \n",
+        sum(OUTPUT >= +abs(corRealValue))/n_permutation + sum(OUTPUT <= -abs(corRealValue))/n_permutation)
+
 ```
 
 In none of the permutations we obtain a value greater or less than the true indegree-grade correlation value. This confirms what we expected since the p-value is very low and it is therefore highly unlikely that there would be such a correlation by chance. Moreover, as we have seen in the previous scatterplot, there seem to be no outliers able to affect the correlation.
