@@ -1,5 +1,5 @@
 ---
-title: "Advanced Social Networks"
+title: ""
 output:
   html_document:
     df_print: paged
@@ -8,55 +8,72 @@ output:
 
 <style>
   body {text-align: justify}
+  .custom_div {
+    background-color: #D5DBEC;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    border: 1px solid #C2C2C2;
+    margin-bottom: 1rem;
+  }
+  .title {
+    text-align: center;
+  }
 </style>
 
+<div class="title">
+# Advanced Social Networks Group Project
 ### University of Trento, 2021-2022
-
+</div>
+<br>
 <p align="center">
   ![](images/unitn_logo.png)
 </p>
 
-<br>
-
-### Exercises for the final paper
 
 ---
 
 ### Group Members
 
-Mattolin Giulio, 224072
+Mattolin Giulio, *224072*, giulio.mattolin@studenti.unitn.it
 
-Paolazzi Elisa, 224424
+Paolazzi Elisa, *224424*, elisa.paolazzi-2@studenti.unitn.it
 
-Passabì Daniele, 221229
+Passabì Daniele, *221229*, daniele.passabi@studenti.unitn.it
 
 ---
 
 ## 1. Drawing a network using R
 
+<div class="custom_div">
+
 You are provided with a unique Excel file (EXERCISE0XX.xls), which contains the directed network (Bullying sheet) capturing who bullies whom among a group of students in an Italian school class. The network was based on asking every person the question “Who do you bully?”.
 
 You are also given a spreadsheet with attributes for each student (Attributes sheet). This included the attributes:
 
--	The student’s gender (0=female, 1=male),
+-	The student’s gender (0 = female, 1 = male),
 - The student’s grade (which goes from 0 to 10, with 10 being the highest grade),
 -	The student’s ethnicity, where: 
     
-    - 1=born abroad with foreign parents (first generation immigrants),
-    -	2=born in Italy with foreign parents (second generation immigrants), 
-    -	3=born in Italy with at least one Italian parent (which we label “Italian”)
+    - 1 $\rightarrow$ born abroad with foreign parents (first generation immigrants),
+    -	2 $\rightarrow$ born in Italy with foreign parents (second generation immigrants), 
+    -	3 $\rightarrow$ born in Italy with at least one Italian parent (which we label “Italian”)
 
-<br>
+</div><br><div class="custom_div">
 
-#### 1.1. Draw the network using the Fruchterman-Reingold layout with names (but without attributes). Add the R script of how you obtained the drawings.
+#### **Point 1.1**
+##### *Draw the network using the Fruchterman-Reingold layout with names (but without attributes).*
+##### *Add the R script of how you obtained the drawings.*
+
+</div>
 
 ```{r message=FALSE, warning=FALSE}
 
-library(xlsx)
-library(dplyr)
+# Import libraries
+library(openxlsx)   # open and read excel files
+library(dplyr)      # data manipulation
 
 # Import .xlsx file
-bully_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheetName = "Bullying", header = TRUE)
+bully_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheet = "Bullying", colNames = TRUE)
 
 # Fix the column types (from dbl to int)
 bully_xlsx = bully_xlsx %>% 
@@ -77,12 +94,15 @@ bully_matrix[1:9,1:9]
 
 library(sna)
 
-# Convert the matrix into a "network" object
+# Convert the matrix into a "network object"
 bully_network = as.network(bully_matrix, directed = TRUE)
 bully_network
 
 ```
 
+The output of the function confirms that we are working with a *directed network* of *25 nodes*, with *74 total ties*. 
+
+It is a *one-mode network*, as we have only one type of nodes (students) and ties (who bullies whom).
 
 ```{r fig.height=14, fig.width=14}
 
@@ -112,22 +132,26 @@ gplot(bully_network,
 
 ```
 
+<div class="custom_div">
 
-#### 1.2. Next draw the network again using the Fruchterman-Reingold layout without names, but now with all 3 attributes (gender, grade and ethnicity) included using in some way a combination of color, shape and size of nodes. Add the R script of how you obtained the drawings. 
+#### **Point 1.2**
+##### *Next draw the network again using the Fruchterman-Reingold layout without names, but now with all 3 attributes (gender, grade and ethnicity) included using in some way a combination of color, shape and size of nodes.*
+##### *Add the R script of how you obtained the drawings.*
+
+</div>
 
 ```{r}
 
 # Import .xlsx attributes data
-attributes_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheetName = "Attributes", header = TRUE)
+attributes_xlsx = read.xlsx("data/EXERCISE006.xlsx", sheet = "Attributes", colNames = TRUE)
 attributes_xlsx
 
 ```
-
 We decide to display the attributes as follows:
 
-- color represents **gender**
-- vertex shape represents **ethnicity**
-- vertex size represent **grade**
+- *color* represents **gender**
+- *vertex shape* represents **ethnicity**
+- *vertex size* represent **grade**
 
 ```{r fig.height=14, fig.width=14}
 
@@ -180,10 +204,14 @@ plot = gplot(bully_network,
 
 ```
 
+<div class="custom_div">
 
-#### 1.3. Create a legend for the attributes (this does not have to be with R, but needs to clarify how the different attributes were represented in the network).
+#### **Point 1.3**
+##### *Create a legend for the attributes (this does not have to be with R, but needs to clarify how the different attributes were represented in the network).*
 
-We can now plot the network with a customize legend indicating the previously specified attriubute-colour/shape/size combinations.
+</div>
+
+We can now plot the network with a customized legend indicating the attribute-color/shape/size combinations previously specified.
 
 ```{r fig.height=14, fig.width=14}
 
@@ -284,7 +312,10 @@ legend(
 
 ## 2. Centrality
 
-#### 2.1 Calculate *indegree* and *outdegree* **centrality** for each node and interpret your results. 
+<br><div class="custom_div">
+
+#### **Point 2.1**
+##### *Calculate **indegree** and **outdegree** **centrality** for each node and interpret your results.*
 
 - Provide the indegree and outdegree centrality score for each node.
 - Who is the most central when it comes to indegree?
@@ -294,12 +325,20 @@ legend(
     - Provide details of the meaning of the value (taking into account that the network is “who do you bully?”).
     - Make sure to discuss the reference points for the outdegree measure. How does it compare to the theoretical minimum and maximum value?
     
+</div>
 
-<br> 
-
+<div class="custom_div">
 ##### *Provide the indegree and outdegree centrality score for each node.*
+</div>
 
-We can calculate indegree and outdegree by counting the incoming and outgoing ties or simply by using the function `sna::degree`.
+When dealing with a direct network we can calculate outdegree and indegree centrality:
+
+- **outdegree centrality** refers to the total number of *outgoing* ties for each node
+- **indegree centrality** refers to the total number of *incoming* ties for each node
+
+If, on the other hand, we were dealing with an indirect network, we would have only one measure of degree centrality.
+
+We can calculate indegree and outdegree by counting incoming and outgoing ties for each node in the network. In R we can use the function `sna::degree`.
 
 ```{r}
 
@@ -321,7 +360,9 @@ degree_df
 ```
 <br> 
 
+<div class="custom_div">
 ##### *Who is the most central when it comes to indegree?*
+</div>
 
 ```{r}
 
@@ -330,30 +371,35 @@ degree_df[degree_df$indegree == max(degree_df$indegree),]
 
 ```
 
-<br> 
+Sara is the most central actor with respect to indegree, with a value of 9.
 
+<br> 
+<div class="custom_div">
 ##### *Provide details of the meaning of the value (taking into account that the network is “who do you bully?”)*
+</div>
 
 Since the network boundaries are represented by the question "who do you bully?" and the indegree value is the number of incoming ties, we can say that **Sara** is the most bullied person in the network.
 
 <br> 
-
+<div class="custom_div">
 ##### *Make sure to discuss the reference points for the indegree measure. How does it compare to the theoretical minimum and maximum value?*
+</div>
 
-The minimum possible value for Indegree is 0, i.e. the situation in which a node is not bullied by any other node.
-The maximum value is instead $n$ - 1 (in this case 25 - 1 = 24), meaning that a node is bullied by all other nodes except itself.
+The minimum possible value for Indegree is $0$, i.e. the situation in which a node is not bullied by any other node.
+The maximum value is instead $n - 1$ (in this case $25 - 1 = 24$), meaning that a node is bullied by all other nodes except itself.
 
-We can normalize the obtained Indegree value to get the proportion of people bullying Sara, from a scale that goes from 0 to 1.
+We can normalize the obtained Indegree value to get the proportion of people bullying Sara, from a scale that goes from $0$ to $1$.
 
 $$
 NormalizedIndegree = \frac{Indegree}{n-1} = \frac{9}{25-1} = 0.375
 $$
 
-From the *NormalizedIndegree* value we can see that Sara is bullied by more than 1/3 of the people in the network.
+From the *NormalizedIndegree* value we can see that Sara is bullied by more than $\displaystyle \frac{1}{3}$ of the people in the network.
 
 <br> 
-
+<div class="custom_div">
 ##### *Who is the most central when it comes to outdegree?*
+</div>
 
 ```{r}
 
@@ -362,26 +408,32 @@ degree_df[degree_df$outdegree == max(degree_df$outdegree),]
 
 ```
 
-<br> 
+Francesco is the most central actor with respect to outdegree, with a value of 8.
 
+<br> 
+<div class="custom_div">
 ##### *Provide details of the meaning of the value (taking into account that the network is “who do you bully?”).*
+</div>
 
 In this case the measure refers to the number of people in the network that **Francesco** says he bullies.
 
 <br> 
-
+<div class="custom_div">
 ##### *Make sure to discuss the reference points for the outdegree measure. How does it compare to the theoretical minimum and maximum value?*
+</div>
 
-Again, the minimum value is 0, in the hypothetical situation where a node does not bully anyone, and the maximum is $n$ - 1, in the situation where an actor bullies all other nodes except himself.
+Again, the minimum value is $0$, in the hypothetical situation where a node does not bully anyone, and the maximum is $n - 1$, in the situation where an actor bullies all other nodes except himself.
 
-We find the normalized value:
+We find the normalized value dividing the outdegree by the maximum possible outdegree:
 
 $$
 NormalizedOutdegree = \frac{Outdegree}{n-1} = \frac{8}{25-1} = 0.333
 $$
-Francesco bullies 1/3 of the network.
+Francesco bullies $\displaystyle \frac{1}{3}$ of the network.
 
-We can also plot the previous graph by colouring Sara (in orange) and Francesco (in red) nodes:
+<br>
+
+We show the position and attributes of Sara and Francesco in the net by highlighting them.
 
 ```{r fig.height=14, fig.width=14}
 
@@ -395,7 +447,7 @@ for (g in attributes_xlsx$Gender) {
   }
 }
 
-# Prepare darker color vector for Sara and Francesco nodes
+# Set darker color for Sara and Francesco nodes
 genderVectorColor[which(degree_df$id == "Sara")] = "#A975A9"
 genderVectorColor[which(degree_df$id == "Francesco")] = "#63A088"
 
@@ -487,17 +539,20 @@ legend(
 
 The last graph highlights that Sara has high marks (9), while Francesco has lower marks (5). Francesco is a first generation immigrant, while Sara is a second generation immigrant.
 
-<br> 
-
-#### 2.2 Let’s assume we hypothesize that the grade of students might be impacted by how many others they are being bullied by. Calculate the correlation between the indegree and the grade of the kid.
+<br>
+<div class="custom_div">
+#### **Point 2.2** 
+##### Let’s assume we hypothesize that the grade of students might be impacted by how many others they are being bullied by. Calculate the correlation between the indegree and the grade of the kid.
 
 - What is the correlation value?
 - What does it mean substantively?
 - Provide the R script of how you obtain the results.
+</div>
 
 <br> 
-
+<div class="custom_div">
 ##### *What is the correlation value?*
+</div>
 
 ```{r}
 
@@ -514,9 +569,12 @@ cor.test(merge_df$Grade, merge_df$indegree)
 
 ```
 
-<br> 
+The correlation value between the *grade of students* and how many others they are being bullied by (*indegree*) is $0.8285039$.
 
+<br> 
+<div class="custom_div">
 ##### *What does it mean substantively?*
+</div>
 
 ```{r message=FALSE, warning=FALSE, fig.align='center'}
 
@@ -530,9 +588,9 @@ ggplot(merge_df, aes(x=indegree, y=Grade)) +
 
 ```
 
-Looking at the results we can say that there is a high correlation between the grade and the indegree (how much a  person is bullied). It is possible to see that this result is statistically significant given its low p-value. Moreover, we can derive that a person with high grades tends to be bullied more, as we saw in Sara's example and in the scatterplot above.
+Looking at the results we can say that there is a high correlation between the grade and the indegree (how much a  person is bullied). It is possible to see that this result is statistically significant given its low p-value ($3.151 \cdot 10^{-7}$). Moreover, we can derive that a person with high grades tends to be bullied more, as we saw in Sara's example and in the scatterplot above.
 
-
+<br>
 Out of curiosity, we also inspect the correlation between the outdegree and the grades.
 
 
@@ -552,14 +610,16 @@ ggplot(merge_df, aes(x=outdegree, y=Grade)) +
 
 ```
 
-In this case, we have a low negative correlation (-0.20) and a quite high p-value, thus the result cannot be considered as statically significant.
+In this case, we have a low negative correlation ($-0.20$) and a quite high p-value, thus the result cannot be considered as statically significant.
 
 <br>
-
-#### 2.3 Finally, perform a significance test using a permutation-based approach for the correlation as discussed in class.
+<div class="custom_div">
+#### **Point 2.3**
+##### Finally, perform a significance test using a permutation-based approach for the correlation as discussed in class.
 
 -	What does the significance test do and what do you conclude?
 -	Add the R script of how you obtained the results.
+</div>
 
 ```{r, fig.align='center'}
 
@@ -609,12 +669,15 @@ It might also be noted that the histogram seems to have a normal shape, however 
 ---
 
 ## 3. Centralization and reciprocity
-
-#### 3.1 Calculate the *indegree* and *outdegree* **centralization** for this network using the approach discussed in class and interpret.
+<br>
+<div class="custom_div">
+#### **Point 3.1**
+##### Calculate the *indegree* and *outdegree* **centralization** for this network using the approach discussed in class and interpret.
 
 - Make sure to show *how* you came to these answers.
 - What do you conclude substantively (taking into account that the network is “who do you bully?”)?
 - Make sure to discuss the reference points for the measure. What is the minimum and maximum value?
+</div>
 
 ```{r}
 
@@ -660,17 +723,21 @@ message(
   )
 
 ```
-The minimum value of indegree and outdegree centralization that can be observed in a network is 0. On the other hand the maximum value is, as we have calculated, equal to: $(n-1)^2$
 
-As can be seen, the normalized values of outdegree and indegree centralization are not very high, which means that in both cases there is no very central node. This means that no one is bullied by the majority of the network or bullies most of the classmates.
+The minimum value of indegree and outdegree centralization that can be observed in a network is $0$. On the other hand the maximum value is, as we have calculated, equal to: $(n-1)^2$.
+
+As can be seen, the normalized values of outdegree and indegree centralization are not very high, which means that in both cases there is no very central node. This implies that no one is bullied by the majority of the network or bullies most of the classmates.
 
 <br> 
-
-#### 3.2 Calculate the arc-based reciprocity index for this network and interpret.
+<div class="custom_div">
+#### **Point 3.2** 
+##### Calculate the arc-based reciprocity index for this network and interpret.
 
 - Make sure to show *how* you came to this answer.
 - What do you conclude substantively (taking into account that the network is “who do you bully?”)?
 - Make sure to discuss the reference points for the measure. What is the minimum, expected and maximum value?
+
+</div>
 
 ```{r message=FALSE, warning=FALSE}
 
@@ -690,26 +757,29 @@ adj_matrix = graph_from_adjacency_matrix(bully_matrix, mode = c("directed"), dia
 igraph::reciprocity(adj_matrix)
 
 ```
+
 `sna::grecip()` and `igraph::reciprocity` use the following formula to obtain the index reciprocity value:
 
 $$
 Index(reciprocity) = \frac{2\cdot Mutual}{2\cdot Mutual + Asymmetric} = \frac{2\cdot 2}{2\cdot 2 + 70} = 0.0541
 $$
 
-The minimum possible value is 0, which is anti-reciprocity:
+The minimum possible value is $0$, which is anti-reciprocity:
 $$
 \frac{2 \cdot M}{2 \cdot M+A}=\frac{2 \cdot 0}{2 \cdot 0+A}=\frac{0}{A}=0
 $$
+
 It occurs when there are no reciprocal dyads.
 
-The maximum possible value is 1, which is perfect reciprocation:
+The maximum possible value is $1$, which is perfect reciprocation:
 
 $$
 \frac{2 \cdot M}{2 \cdot M+A}=\frac{2 \cdot M}{2 \cdot M+0}=\frac{2 \cdot M}{2 \cdot M}=1
 $$
+
 It occurs when there are only reciprocal dyads and no asymmetrical dyads in the network.
 
-As it can be seen, the index for our network is very close to the minimum value. By calculating indegree and outdegree, bullies can also be bullied (Angela: indegree = 4, outdegree = 6), but usually the same actors are not involved. In our network it is therefore rare for nodes to bully each other. This result seems to be realistic since usually the "who do you bully" relationship is typically one-sided.
+As it can be seen, the index for our network is very close to the minimum value. By calculating indegree and outdegree, bullies can also be bullied (e.g. Angela: indegree = 4, outdegree = 6), but usually the same actors are not involved. In our network it is therefore rare for nodes to bully each other. This result seems to be realistic since usually the "who do you bully" relationship is typically one-sided.
 
 ---
 
