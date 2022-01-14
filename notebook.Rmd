@@ -353,7 +353,7 @@ outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
 freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
 
 
-# Create a dataset to stor these infromation
+# Create a dataset to store these information
 degree_df = data.frame(id, indegree, outdegree, freeman)
 degree_df
 
