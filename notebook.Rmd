@@ -349,7 +349,7 @@ id = rownames(bully_xlsx)
 indegree = sna::degree(bully_network, gmode = "digraph", cmode = "indegree")
 # Calculate outdegree
 outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
-# Calculate centrality
+# Calculate freeman centrality
 freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
 
 
@@ -610,7 +610,7 @@ ggplot(merge_df, aes(x=outdegree, y=Grade)) +
 
 ```
 
-In this case, we have a low negative correlation ($-0.20$) and a quite high p-value, thus the result cannot be considered as statically significant.
+In this case, we have a low negative correlation ($-0.20$) and a quite high p-value, thus the result cannot be considered as statistically significant.
 
 <br>
 <div class="custom_div">
@@ -661,6 +661,10 @@ message(
   )
 
 ```
+
+A test of significance is a formal procedure for comparing observed data with a claim
+(also called a hypothesis), the truth of which is being assessed.
+Tests for statistical significance indicate whether observed differences between assessment results are due to chance, which should be ignored because they lead to incorrect assumptions, or whether they are due to significant patterns.
 
 In none of the permutations we obtain a value greater or less than the true indegree-grade correlation value. This confirms what we expected since the p-value is very low and it is therefore highly unlikely that there would be such a correlation by chance. Moreover, as we have seen in the previous scatterplot, there seem to be no outliers able to affect the correlation.
 It might also be noted that the histogram seems to have a normal shape, however this may not be the case, since it is the p-value itself that is built on the assumption of normality.

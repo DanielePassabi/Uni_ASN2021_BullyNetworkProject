@@ -224,7 +224,7 @@ id = rownames(bully_xlsx)
 indegree = sna::degree(bully_network, gmode = "digraph", cmode = "indegree")
 # Calculate outdegree
 outdegree = sna::degree(bully_network, gmode = "digraph", cmode = "outdegree")
-# Calculate centrality
+# Calculate freeman centrality
 freeman = sna::degree(bully_network, gmode = "digraph", cmode = "freeman")
 
 
